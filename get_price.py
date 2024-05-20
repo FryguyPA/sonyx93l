@@ -2,6 +2,8 @@ import requests
 import re
 import logging
 from time import sleep
+import os
+
 
 # Configure logging to save the response data
 logging.basicConfig(
@@ -13,6 +15,16 @@ logging.basicConfig(
 
 # Create a logger object
 logger = logging.getLogger()
+
+
+# This is a Mac Pop-up notification for errors and price changes
+def send_notification(title, text):
+    logging.info('Sending popup notification')
+    applescript = f'''
+    display notification "{text}" with title "{title}"
+    '''
+
+    os.system(f"osascript -e '{applescript}'")
 
 # This si the URL for the TV
 url = "https://www.bestbuy.com/site/sony-75-class-bravia-xr-x93l-mini-led-4k-uhd-smart-google-tv/6543516.p?skuId=6543516"
@@ -61,6 +73,8 @@ if response.status_code == 200:
             print('Price went up!  Ouch! \n')
         elif price < purchase_price:
             print('Price dropped!\n')
+            savings = purchase_price - price
+            send_notification("Best Buy Alert", "The price of the TV has dropped by $" + str(savings))
 
         print(f"Price = ${price}\n\n")
 
@@ -70,3 +84,4 @@ if response.status_code == 200:
 # Got a bad status code, hmm - check it if this happens
 else:
     print(f'Error: {response.status_code}')
+    send_notification("Best Buy Error", "Something failed - please check code")
