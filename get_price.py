@@ -84,4 +84,5 @@ if response.status_code == 200:
 # Got a bad status code, hmm - check it if this happens
 else:
     print(f'Error: {response.status_code}')
+    logging.info(f'Error: {response.status_code}')
     send_notification("Best Buy Error", "Something failed - please check code")
